@@ -26,7 +26,7 @@ public class ProductAdvice {
         errorMap.put("status", errorStatus[0]);
         errorMap.put("statusCode", errorStatus[1]);
         exception.getBindingResult().getFieldErrors().forEach(error -> {
-            errorMap.put("Message", error.getDefaultMessage());
+            errorMap.put("message", error.getDefaultMessage());
         });
         return new ResponseEntity<>(errorMap, HttpStatus.BAD_REQUEST);
     }
@@ -50,20 +50,10 @@ public class ProductAdvice {
         String [] errorStatus = HttpStatus.BAD_REQUEST.toString().split(" ");
         errorMap.put("status", errorStatus[0]);
         errorMap.put("statusCode", errorStatus[1]);
-        errorMap.put("message", "Check inputs");
+        errorMap.put("message", "Check input.");
         return new ResponseEntity<>(errorMap, HttpStatus.BAD_REQUEST);
     }
 
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    @ExceptionHandler(ChangeSetPersister.NotFoundException.class)
-    public ResponseEntity<Map<String, String>> handleNotFoundException(ChangeSetPersister.NotFoundException ex) {
-        Map<String, String> errorMap = new HashMap<>();
-        String [] errorStatus = HttpStatus.BAD_REQUEST.toString().split(" ");
-        errorMap.put("status", errorStatus[0]);
-        errorMap.put("statusCode", errorStatus[1]);
-        errorMap.put("message", "Product not found");
-        return new ResponseEntity<>(errorMap, HttpStatus.BAD_REQUEST);
-    }
 
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     @ExceptionHandler(ProductException.class)//Custom error handling, mainly used for handling businesslogic errors

@@ -6,6 +6,7 @@ import com.magpie.magpiecodingchallenge.Model.Product;
 import com.magpie.magpiecodingchallenge.Repository.ProductRepository;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.crossstore.ChangeSetPersister;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -49,25 +50,34 @@ public class ProductService {
     public Product update(ObjectId id, ProductUpdateDTO productUpdateDTO) throws ProductException {
         Product prod = productRepository.findById(id).orElseThrow(() -> new ProductException("Product does not exist"));
 
-        if(productUpdateDTO.getName() != null && !productUpdateDTO.getName().isEmpty() && !Objects.equals(prod.getName(), productUpdateDTO.getName())){
+        if(productUpdateDTO.getName() != null && !productUpdateDTO.getName().isEmpty() && productUpdateDTO.getName().matches("^[a-zA-Z0-9]*$") && !Objects.equals(prod.getName(), productUpdateDTO.getName())){
             prod.setName(productUpdateDTO.getName());
         }
+
         if(productUpdateDTO.getDescription() != null && !productUpdateDTO.getDescription().isEmpty() && !Objects.equals(prod.getDescription(), productUpdateDTO.getDescription())){
             prod.setDescription(productUpdateDTO.getDescription());
         }
-        if(productUpdateDTO.getType() != null && !productUpdateDTO.getType().isEmpty() && !Objects.equals(prod.getType(), productUpdateDTO.getType())){
+
+        if(productUpdateDTO.getType() != null && !productUpdateDTO.getType().isEmpty() && productUpdateDTO.getType().matches("^(Food|Sports|Household|Music|Electronic|Appliance)$") && !Objects.equals(prod.getType(), productUpdateDTO.getType())){
             prod.setType(productUpdateDTO.getType());
         }
+
         if(productUpdateDTO.getQuantity() != null && productUpdateDTO.getQuantity() > 0){
             prod.setQuantity(productUpdateDTO.getQuantity());
         }
+
         if(productUpdateDTO.getPrice() != null && productUpdateDTO.getPrice() > 0){
             prod.setPrice(productUpdateDTO.getPrice());
         }
+
         return productRepository.save(prod);
     }
 
-    public Product delete(String id){
-        return productRepository.deleteById(id);
+    public void delete(String id) throws ProductException {
+        productRepository.deleteById(id).orElseThrow(() -> new ProductException("Product does not exist"));
+    }
+
+    public void deleteAll() throws ProductException {
+        productRepository.deleteAll();
     }
 }

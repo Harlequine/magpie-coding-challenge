@@ -21,9 +21,15 @@ public class Product {
     private String id;
 
     @NotBlank(message = "Product Name should not be blank.")
+    @Pattern(
+            regexp = "^[a-zA-Z0-9]*$",
+            message = "Product name must not include any special characters."
+    )
     private String name;
+
     @NotBlank(message = "Description should not be blank.")
     private String description;
+
     @NotBlank(message = "Type should not be blank.")
     @Pattern(
             regexp = "^(Food|Sports|Household|Music|Electronic|Appliance)$",

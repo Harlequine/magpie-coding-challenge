@@ -7,12 +7,12 @@ import com.magpie.magpiecodingchallenge.Service.ProductService;
 import jakarta.validation.Valid;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.crossstore.ChangeSetPersister;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/v1/product")
@@ -47,7 +47,14 @@ public class ProductController {
     }
 
     @DeleteMapping("/delete/{id}")
-    public ResponseEntity<Product> delete(@PathVariable("id") String id){
-        return new ResponseEntity<>(productService.delete(id), HttpStatus.OK);
+    public ResponseEntity<?> delete(@PathVariable("id") String id) throws ProductException{
+        productService.delete(id);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @DeleteMapping("/delete-all")
+    public ResponseEntity<?> deleteAll() throws ProductException{
+        productService.deleteAll();
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 }

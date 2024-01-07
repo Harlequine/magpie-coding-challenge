@@ -17,16 +17,24 @@ public class ProductConfig {
             List<Product> prod = productRepository.findAll();
             if(prod.isEmpty()){
                 Product dummy1 = Product.builder()
-                        .name("Sample Pasasroduct")
-                        .description("Sample Descasasription")
-                        .type("Sample Typeasasa")
+                        .name("Refrigerator")
+                        .description("A large container which is kept cool inside, usually by electricity, so that the food and drink in it stays fresh.")
+                        .type("Appliance")
+                        .quantity(10123L)
+                        .price(25123L)
+                        .build();
+
+                Product dummy2 = Product.builder()
+                        .name("TV")
+                        .description("A telecommunication medium for transmitting moving images and sound.")
+                        .type("Appliance")
                         .quantity(10123L)
                         .price(25123L)
                         .build();
 
 
                 productRepository.saveAll(
-                        List.of(dummy1)
+                        List.of(dummy1,dummy2)
                 );
             }
 
