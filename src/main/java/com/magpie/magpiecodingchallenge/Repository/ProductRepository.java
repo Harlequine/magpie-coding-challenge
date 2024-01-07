@@ -13,6 +13,6 @@ public interface ProductRepository extends MongoRepository <Product, ObjectId>{
 
     Product deleteById(String id);
 
-    Optional<Product> findByName(String name);
+    Optional<Product> findOneByName(String name);
 
 }

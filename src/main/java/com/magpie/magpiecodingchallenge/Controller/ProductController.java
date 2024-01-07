@@ -1,6 +1,7 @@
 package com.magpie.magpiecodingchallenge.Controller;
 
 import com.magpie.magpiecodingchallenge.DTO.ProductUpdateDTO;
+import com.magpie.magpiecodingchallenge.Exception.ProductException;
 import com.magpie.magpiecodingchallenge.Model.Product;
 import com.magpie.magpiecodingchallenge.Service.ProductService;
 import jakarta.validation.Valid;
@@ -26,18 +27,23 @@ public class ProductController {
 
 
     @PostMapping("/add")
-    ResponseEntity<?> add(@RequestBody @Valid Product product) throws Exception{
+    ResponseEntity<Product> add(@RequestBody @Valid Product product) throws ProductException {
         return new ResponseEntity<>(productService.add(product), HttpStatus.CREATED);
     }
 
     @GetMapping("/find-all")
-    public ResponseEntity<List<Product>> findAll(){
+    public ResponseEntity<List<Product>> findAll() throws ProductException{
         return new ResponseEntity<>(productService.findAll(), HttpStatus.OK);
     }
 
+    @GetMapping("/find/{name}")
+    public ResponseEntity<Product> findOne(@PathVariable("name") String name) throws ProductException{
+        return new ResponseEntity<>(productService.findOne(name), HttpStatus.OK);
+    }
+
     @PutMapping("/update/{id}")
-    public ResponseEntity<Product> update(@PathVariable("id") ObjectId id, @RequestBody ProductUpdateDTO productUpdateDTO) throws Exception {
-        return  new ResponseEntity<>(productService.update(id, productUpdateDTO),HttpStatus.ACCEPTED);
+    public ResponseEntity<Product> update(@PathVariable("id") ObjectId id, @RequestBody ProductUpdateDTO productUpdateDTO) throws ProductException {
+        return new ResponseEntity<>(productService.update(id, productUpdateDTO),HttpStatus.ACCEPTED);
     }
 
     @DeleteMapping("/delete/{id}")

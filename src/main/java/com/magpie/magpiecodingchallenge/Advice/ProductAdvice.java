@@ -1,6 +1,7 @@
 package com.magpie.magpiecodingchallenge.Advice;
 
 
+import com.magpie.magpiecodingchallenge.Exception.ProductException;
 import org.springframework.data.crossstore.ChangeSetPersister;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,8 +18,8 @@ import java.util.Map;
 @RestControllerAdvice
 public class ProductAdvice {
 
-    @ResponseStatus(HttpStatus.BAD_REQUEST)// Bad Request for input that did not pass validation bean
-    @ExceptionHandler(MethodArgumentNotValidException.class)//exception to be thrown when validation on an arguement annotated with @Valid fails
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<Map<String, String>> handleMethodArgumentException(MethodArgumentNotValidException exception) {
         Map<String, String> errorMap = new HashMap<>();
         String [] errorStatus = HttpStatus.BAD_REQUEST.toString().split(" ");
@@ -27,8 +28,6 @@ public class ProductAdvice {
         exception.getBindingResult().getFieldErrors().forEach(error -> {
             errorMap.put("Message", error.getDefaultMessage());
         });
-
-
         return new ResponseEntity<>(errorMap, HttpStatus.BAD_REQUEST);
     }
 
@@ -45,7 +44,7 @@ public class ProductAdvice {
     }
 
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    @ExceptionHandler(HttpMessageNotReadableException.class)//thrown when the request payload (body) is not readable. This can happen for various reasons
+    @ExceptionHandler(HttpMessageNotReadableException.class)
     public ResponseEntity<Map<String, String>> handleHttpMessageNotReadableException(HttpMessageNotReadableException ex) {
         Map<String, String> errorMap = new HashMap<>();
         String [] errorStatus = HttpStatus.BAD_REQUEST.toString().split(" ");
@@ -56,7 +55,7 @@ public class ProductAdvice {
     }
 
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    @ExceptionHandler(ChangeSetPersister.NotFoundException.class)//thrown when the request payload (body) is not readable. This can happen for various reasons
+    @ExceptionHandler(ChangeSetPersister.NotFoundException.class)
     public ResponseEntity<Map<String, String>> handleNotFoundException(ChangeSetPersister.NotFoundException ex) {
         Map<String, String> errorMap = new HashMap<>();
         String [] errorStatus = HttpStatus.BAD_REQUEST.toString().split(" ");
@@ -64,6 +63,17 @@ public class ProductAdvice {
         errorMap.put("statusCode", errorStatus[1]);
         errorMap.put("message", "Product not found");
         return new ResponseEntity<>(errorMap, HttpStatus.BAD_REQUEST);
+    }
+
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    @ExceptionHandler(ProductException.class)//Custom error handling, mainly used for handling businesslogic errors
+    public ResponseEntity<Map<String, String>> handleBusinessException(ProductException ex) {
+        Map<String, String> errorMap = new HashMap<>();
+        String [] errorStatus = HttpStatus.BAD_REQUEST.toString().split(" ");
+        errorMap.put("status", errorStatus[0]);
+        errorMap.put("statusCode", errorStatus[1]);
+        errorMap.put("message", ex.getMessage());
+        return new ResponseEntity<>(errorMap, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
 }

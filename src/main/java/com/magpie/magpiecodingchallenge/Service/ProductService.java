@@ -1,11 +1,11 @@
 package com.magpie.magpiecodingchallenge.Service;
 
 import com.magpie.magpiecodingchallenge.DTO.ProductUpdateDTO;
+import com.magpie.magpiecodingchallenge.Exception.ProductException;
 import com.magpie.magpiecodingchallenge.Model.Product;
 import com.magpie.magpiecodingchallenge.Repository.ProductRepository;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.crossstore.ChangeSetPersister;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -23,21 +23,31 @@ public class ProductService {
     }
 
 
-    public Product add(Product product) throws Exception{
-        Optional<Product> prod = productRepository.findByName(product.getName());
+    public Product add(Product product) throws ProductException {
+        Optional<Product> prod = productRepository.findOneByName(product.getName());
 
         if(prod.isPresent()){
-            throw new Exception();
+            throw new ProductException("Product name already exist.");
         }
 
         return productRepository.save(product);
     }
-    public List<Product> findAll(){
-        return productRepository.findAll();
+    public List<Product> findAll() throws ProductException{
+        List<Product> prod = productRepository.findAll();
+
+        if(prod.isEmpty()){
+            throw new ProductException("Product does not exists");
+        }
+
+        return prod;
     }
 
-    public Product update(ObjectId id, ProductUpdateDTO productUpdateDTO) throws ChangeSetPersister.NotFoundException {
-        Product prod = productRepository.findById(id).orElseThrow(ChangeSetPersister.NotFoundException::new);
+    public Product findOne(String name) throws ProductException{
+        return productRepository.findOneByName(name).orElseThrow(() -> new ProductException("Product does not exist"));
+    }
+
+    public Product update(ObjectId id, ProductUpdateDTO productUpdateDTO) throws ProductException {
+        Product prod = productRepository.findById(id).orElseThrow(() -> new ProductException("Product does not exist"));
 
         if(productUpdateDTO.getName() != null && !productUpdateDTO.getName().isEmpty() && !Objects.equals(prod.getName(), productUpdateDTO.getName())){
             prod.setName(productUpdateDTO.getName());
